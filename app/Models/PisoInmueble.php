@@ -36,6 +36,6 @@ class PisoInmueble extends Model
 
     public function habitaciones(): HasMany
     {
-        return $this->hasMany(Habitacion::class, 'PisInmId', 'PisInmId');
+        return $this->hasMany(HabitacionInmueble::class, 'PisInmId', 'PisInmId');
     }
 }

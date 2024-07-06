@@ -43,6 +43,15 @@ class Usuario extends Authenticatable
         return $this->belongsTo(Persona::class, 'PerId', 'PerId');
     }
 
+    public function inmuebles()
+    {
+        if ($this->rol->RolNombre === 'Arrendador') {
+            return $this->hasMany(Inmueble::class, 'UsuId', 'UsuId');
+        } else {
+            return collect();
+        }
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->whereAny([

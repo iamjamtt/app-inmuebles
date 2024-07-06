@@ -6,21 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Habitacion extends Model
+class HabitacionInmueble extends Model
 {
     use HasFactory;
 
-    protected $table = 'Habitacion';
-    protected $primaryKey = 'HabId';
+    protected $table = 'HabitacionInmueble';
+    protected $primaryKey = 'HabInmId';
     public $timestamps = false;
     protected $fillable = [
-        'HabId',
+        'HabInmId',
         'PisInmId',
-        'HabNombre',
-        'HabPrecio',
-        'HabEstado',
-        'HabOcupado',
-        'HabFechaCreacion',
+        'HabInmNombre',
+        'HabInmPrecio',
+        'HabInmEstado',
+        'HabInmOcupado',
+        'HabInmFechaCreacion',
     ];
 
     protected $casts = [

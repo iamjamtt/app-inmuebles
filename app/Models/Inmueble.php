@@ -17,6 +17,7 @@ class Inmueble extends Model
     protected $fillable = [
         'InmId',
         'TipInmId',
+        'UsuId',
         'InmNombre',
         'InmDescripcion',
         'InmDireccion',
@@ -39,6 +40,11 @@ class Inmueble extends Model
     public function tipo_inmueble(): BelongsTo
     {
         return $this->belongsTo(TipoInmueble::class, 'TipInmId', 'TipInmId');
+    }
+
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(Usuario::class, 'UsuId', 'UsuId');
     }
 
     public function pisos(): HasMany

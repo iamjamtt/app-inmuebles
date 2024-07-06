@@ -16,7 +16,7 @@ class AlquilerDetalle extends Model
     protected $fillable = [
         'AlqDetId',
         'AlqId',
-        'HabId',
+        'HabInmId',
         'AlqDetMonto',
         'AlqDetEstado',
         'AlqDetFechaCreacion',
@@ -33,8 +33,8 @@ class AlquilerDetalle extends Model
         return $this->belongsTo(Alquiler::class, 'AlqId', 'AlqId');
     }
 
-    public function habitacion(): BelongsTo
+    public function habitacion_inmueble(): BelongsTo
     {
-        return $this->belongsTo(Habitacion::class, 'HabId', 'HabId');
+        return $this->belongsTo(HabitacionInmueble::class, 'HabInmId', 'HabInmId');
     }
 }
