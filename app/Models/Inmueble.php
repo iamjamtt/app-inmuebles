@@ -45,4 +45,11 @@ class Inmueble extends Model
     {
         return $this->hasMany(PisoInmueble::class, 'InmId', 'InmId');
     }
+
+    public function scopeSearch($query, $search)
+    {
+        if ($search) {
+            return $query->whereAny(['InmNombre', 'InmDescripcion', 'InmDireccion'], 'LIKE', '%' . $search . '%');
+        }
+    }
 }
