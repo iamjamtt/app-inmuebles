@@ -16,4 +16,16 @@ Volt::route('/usuarios', 'usuario.index')
 Volt::route('/inmuebles', 'inmueble.index')
     ->middleware('auth')
     ->name('inmueble.index');
+
+Volt::route('/inmuebles/create', 'inmueble.form-inmueble')
+    ->middleware('auth')
+    ->name('inmueble.create');
+
+Volt::route('/inmuebles/{InmId}/edit', 'inmueble.form-inmueble')
+    ->middleware('auth')
+    ->name('inmueble.edit');
+
+Volt::route('/inmuebles/{InmId}/pisos', 'inmueble.asignar-piso')
+    ->middleware('auth')
+    ->name('inmueble.asignar-piso');
 //

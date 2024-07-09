@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class HabitacionInmueble extends Model
 {
@@ -33,5 +34,10 @@ class HabitacionInmueble extends Model
     public function piso_inmueble(): BelongsTo
     {
         return $this->belongsTo(PisoInmueble::class, 'PisInmId', 'PisInmId');
+    }
+
+    public function alquileres(): HasMany
+    {
+        return $this->hasMany(AlquilerDetalle::class, 'HabInmId', 'HabInmId');
     }
 }

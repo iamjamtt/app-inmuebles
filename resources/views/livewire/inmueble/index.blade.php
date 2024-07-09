@@ -18,12 +18,54 @@ new #[Title('Inmuebles | App Inmuebles')] class extends Component {
 
     public $inmuebleId = null;
 
+    // Modal Alerta
+    public bool $modalAlerta = false;
+    public string $titleModalAlerta = '';
+    public string $subtitleModalAlerta = 'Click en confirmar para cambiar el estado del inmueble.';
+    public string $buttonModalAlerta = '';
+    public string $actionModalAlerta = '';
+
+    public function alertaStatus(Inmueble $inmueble): void
+    {
+        $this->inmuebleId = $inmueble->InmId;
+        if ($inmueble->InmEstado && $inmueble->InmFechaDadoAlta) {
+            $this->titleModalAlerta = '¿Estas seguro de dar de baja este inmueble?';
+            $this->subtitleModalAlerta = 'Click en confirmar para dar de baja el inmueble.';
+        } elseif ($inmueble->InmEstado == false && $inmueble->InmFechaDadoBaja) {
+            $this->titleModalAlerta = '¿Estas seguro de dar de alta este inmueble?';
+            $this->subtitleModalAlerta = 'Click en confirmar para dar de alta el inmueble.';
+        } elseif ($inmueble->InmEstado == false && !$inmueble->InmFechaDadoAlta && !$inmueble->InmFechaDadoBaja) {
+            $this->titleModalAlerta = '¿Estas seguro de publicar este inmueble?';
+            $this->subtitleModalAlerta = 'Click en confirmar para publicar el inmueble.';
+        }
+        $this->buttonModalAlerta = 'Confirmar';
+        $this->actionModalAlerta = 'changeStatus';
+        $this->modalAlerta = true;
+    }
+
+    public function changeStatus(): void
+    {
+        $inmueble = Inmueble::find($this->inmuebleId);
+        if ($inmueble->InmEstado && $inmueble->InmFechaDadoAlta) {
+            $inmueble->InmEstado = false;
+            $inmueble->InmFechaDadoBaja = now();
+        } elseif ($inmueble->InmEstado == false && $inmueble->InmFechaDadoBaja) {
+            $inmueble->InmEstado = true;
+            $inmueble->InmFechaDadoAlta = now();
+        } elseif ($inmueble->InmEstado == false && !$inmueble->InmFechaDadoAlta && !$inmueble->InmFechaDadoBaja) {
+            $inmueble->InmEstado = true;
+            $inmueble->InmFechaDadoAlta = now();
+        }
+        $inmueble->save();
+        $this->success('El estado del inmueble fue cambiado correctamente.', position: 'toast-top toast-center');
+        $this->modalAlerta = false;
+    }
+
     public function headers(): array
     {
         return [
             ['key' => 'InmId', 'label' => '#', 'class' => 'w-1'],
             ['key' => 'InmNombre', 'label' => 'Nombre'],
-            ['key' => 'InmDireccion', 'label' => 'Dirección'],
             ['key' => 'precio', 'label' => 'Precio', 'sortable' => false],
             ['key' => 'TipInmId', 'label' => 'Tipo Inmueble'],
             ['key' => 'InmOcupado', 'label' => 'Ocupado'],
@@ -67,12 +109,12 @@ new #[Title('Inmuebles | App Inmuebles')] class extends Component {
             <x-input placeholder="Buscar..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-
+            <x-button label="Registrar" icon="o-plus" class="btn-info" link="/inmuebles/create" />
         </x-slot:actions>
     </x-header>
 
     <!-- TABLE  -->
-    {{-- <x-card title="Lista de Usuarios" class="shadow-lg" shadow>
+    <x-card title="Lista de Inmuebles" class="shadow-lg" shadow separator>
         <x-slot:menu>
             <div class="flex items-center space-x-2">
                 <span>Mostrar</span>
@@ -80,40 +122,86 @@ new #[Title('Inmuebles | App Inmuebles')] class extends Component {
                 <span>registros</span>
             </div>
         </x-slot:menu>
-        <x-table :headers="$headers" :rows="$usuarios" :sort-by="$sortBy" with-pagination >
-            @scope('cell_UsuId', $usuario)
-            {{ $usuario->UsuId }}
+        <x-table :headers="$headers" :rows="$inmuebles" :sort-by="$sortBy" with-pagination >
+            @scope('cell_InmId', $item)
+            {{ $item->InmId }}
             @endscope
-            @scope('cell_UsuUsername', $usuario)
-            {{ '@'.$usuario->UsuUsername }}
-            @endscope
-            @scope('cell_RolId', $usuario)
-            <div class="badge badge-{{ colorRol($usuario->rol->RolNombre) }}">
-                {{ $usuario->rol->RolNombre }}
+            @scope('cell_InmNombre', $item)
+            <div class="flex items-center space-x-2">
+                <img src="{{ $item->InmFoto ? asset($item->InmFoto) : 'https://via.placeholder.com/150' }}" alt="Foto"
+                    class="w-16 h-16 rounded-lg" />
+                <div class="flex flex-col">
+                    <span class="font-semibold">{{ $item->InmNombre }}</span>
+                    <span class="text-xs text-gray-500">
+                        {{ Str::limit($item->InmDescripcion, 50) }}
+                    </span>
+                </div>
             </div>
             @endscope
-            @scope('cell_UsuFechaCreacion', $usuario)
-            {{ convertirHoraFecha($usuario->UsuFechaCreacion) }}
+            @scope('cell_precio', $item)
+            <span class="font-semibold">
+                @if (calcularPrecioInmueble($item->InmId) == 0)
+                    <span class="text-gray-500">
+                        Sin Precio
+                    </span>
+                @else
+                    {{ 'S/. ' . calcularPrecioInmueble($item->InmId) }}
+                @endif
+            </span>
             @endscope
-            @scope('cell_UsuEstado', $usuario)
-            @if($usuario->UsuEstado)
-                <div class="badge badge-info" wire:click="alertaStatus({{ $usuario->UsuId }})" style="cursor: pointer;">
-                    <x-icon name="o-check" class="w-4 h-4 me-2" />
-                    De Alta
+            @scope('cell_TipInmId', $item)
+            {{ $item->tipo_inmueble->TipInmNombre }}
+            @endscope
+            @scope('cell_InmOcupado', $item)
+            @if($item->InmOcupado)
+                <div class="badge badge-error">
+                    Ocupado
                 </div>
             @else
-                <div class="badge badge-error" wire:click="alertaStatus({{ $usuario->UsuId }})" style="cursor: pointer;">
-                    <x-icon name="o-x-mark" class="w-4 h-4 me-2" />
-                    De Baja
+                <div class="badge badge-ghost">
+                    Desocupado
                 </div>
             @endif
             @endscope
-            @scope('cell_accion', $usuario)
-            <div class="flex space-x-2">
-                <x-button icon="o-pencil" wire:click="edit({{ $usuario->UsuId }})" class="btn-sm text-blue-500" tooltip="Editar" />
-                <x-button icon="o-trash" spinner class="btn-sm text-red-500" tooltip="Eliminar" wire:click="alertaDelete({{ $usuario->UsuId }})" />
-            </div>
+            @scope('cell_InmFechaCreacion', $item)
+            {{ convertirHoraFecha($item->InmFechaCreacion) }}
+            @endscope
+            @scope('cell_InmEstado', $item)
+            @if($item->InmEstado && $item->InmFechaDadoAlta)
+                <div class="badge badge-info" wire:click="alertaStatus({{ $item->InmId }})" style="cursor: pointer;">
+                    <x-icon name="o-check" class="w-4 h-4 me-2" />
+                    De Alta
+                </div>
+            @elseif($item->InmEstado == false && $item->InmFechaDadoBaja)
+                <div class="badge badge-error" wire:click="alertaStatus({{ $item->InmId }})" style="cursor: pointer;">
+                    <x-icon name="o-x-mark" class="w-4 h-4 me-2" />
+                    De Baja
+                </div>
+            @elseif($item->InmEstado == false && !$item->InmFechaDadoAlta && !$item->InmFechaDadoBaja)
+                <div class="badge badge-warning" wire:click="alertaStatus({{ $item->InmId }})" style="cursor: pointer;">
+                    <x-icon name="o-information-circle" class="w-4 h-4 me-2" />
+                    Pendiente
+                </div>
+            @endif
+            @endscope
+            @scope('cell_accion', $item)
+            <x-dropdown>
+                <x-slot:trigger>
+                    <x-button icon="o-ellipsis-horizontal" class="btn-sm" />
+                </x-slot:trigger>
+                <x-menu-item title="Asignar Pisos" icon="o-building-office" link="/inmuebles/{{ $item->InmId }}/pisos" />
+                <x-menu-item title="Editar" icon="o-pencil" link="/inmuebles/{{ $item->InmId }}/edit" />
+                <x-menu-item title="Eliminar" icon="o-trash" wire:click="alertaDelete({{ $item->InmId }})" />
+            </x-dropdown>
             @endscope
         </x-table>
-    </x-card> --}}
+    </x-card>
+
+    <!-- MODALS -->
+    <x-modal wire:model="modalAlerta" title="{{ $titleModalAlerta }}" subtitle="{{ $subtitleModalAlerta }}">
+        <x-slot:actions>
+            <x-button label="Cancelar" @click="$wire.modalAlerta = false" />
+            <x-button label="{{ $buttonModalAlerta }}" class="btn-success" wire:click="{{ $actionModalAlerta }}" />
+        </x-slot:actions>
+    </x-modal>
 </div>

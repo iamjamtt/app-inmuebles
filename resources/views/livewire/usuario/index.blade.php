@@ -192,8 +192,8 @@ new #[Title('Usuarios | App Inmuebles')] class extends Component {
             @endscope
             @scope('cell_accion', $usuario)
             <div class="flex space-x-2">
-                {{-- <x-button icon="o-pencil" wire:click="edit({{ $usuario->UsuId }})" class="btn-sm text-blue-500" tooltip="Editar" /> --}}
-                <x-button icon="o-trash" spinner class="btn-sm text-red-500" tooltip="Eliminar" wire:click="alertaDelete({{ $usuario->UsuId }})" />
+                {{-- <x-button icon="o-pencil" wire:click="edit({{ $usuario->UsuId }})" class="text-blue-500 btn-sm" tooltip="Editar" /> --}}
+                <x-button icon="o-trash" spinner class="text-red-500 btn-sm" tooltip="Eliminar" wire:click="alertaDelete({{ $usuario->UsuId }})" />
             </div>
             @endscope
         </x-table>
