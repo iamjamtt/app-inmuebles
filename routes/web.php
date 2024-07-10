@@ -2,6 +2,9 @@
 
 use Livewire\Volt\Volt;
 
+Volt::route('/', 'home.usuario')
+    ->name('home.usuario');
+
 Volt::route('/login', 'auth.login')
     ->middleware('guest')
     ->name('login');
