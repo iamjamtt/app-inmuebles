@@ -28,7 +28,6 @@
 
         <x-slot:actions>
             <x-button label="Inicio" icon="o-home" link="/" class="hidden btn-ghost lg:flex" responsive />
-            {{-- <x-button label="Notifications" icon="o-bell" link="###" class="hidden btn-ghost lg:flex" responsive /> --}}
             <x-button label="Ingresar" icon="o-arrow-top-right-on-square" class="btn-success" responsive />
             <x-button label="Registrate" icon="o-user-plus" class="btn-outline" responsive />
         </x-slot:actions>
