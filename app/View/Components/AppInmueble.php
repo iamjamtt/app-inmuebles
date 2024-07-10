@@ -26,8 +26,9 @@ class AppInmueble extends Component
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
                         <div class="flex items-center gap-2">
-                            <x-icon name="s-home-modern" class="w-6 -mb-1 text-zinc-700" />
-                            <span class="font-bold text-3xl me-3 bg-gradient-to-r from-zinc-700 to-zinc-500 bg-clip-text text-transparent ">
+                            <x-avatar :image="asset('inmueble-favicon.webp')" class="!w-10" />
+                            <!-- <x-icon name="s-home-modern" class="w-6 -mb-1 text-zinc-700" /> -->
+                            <span class="text-3xl font-bold text-transparent me-3 bg-gradient-to-r from-zinc-700 to-zinc-500 bg-clip-text ">
                                 Inmuebles
                             </span>
                         </div>
