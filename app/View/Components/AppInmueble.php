@@ -36,7 +36,7 @@ class AppInmueble extends Component
 
                     <!-- Display when collapsed -->
                     <div class="display-when-collapsed hidden mx-5 mt-4 lg:mb-6 h-[28px]">
-                        <x-icon name="s-home-modern" class="w-6 -mb-1 text-zinc-700" />
+                        <x-avatar :image="asset('inmueble-favicon.webp')" class="!w-10" />
                     </div>
                 </a>
             HTML;
