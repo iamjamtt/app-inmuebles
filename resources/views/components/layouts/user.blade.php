@@ -26,10 +26,26 @@
             <x-app-inmueble />
         </x-slot:brand>
 
+        @php
+        if (auth()->check()) {
+            $usuario = App\Models\Usuario::find(auth()->id());
+            $rol = $usuario->rol->RolNombre;
+        } else {
+            $usuario = null;
+            $rol = null;
+        }
+        @endphp
+
         <x-slot:actions>
-            <x-button label="Inicio" icon="o-home" link="/" class="hidden btn-ghost lg:flex" responsive />
-            <x-button label="Ingresar" icon="o-arrow-top-right-on-square" link="/login" class="btn-success" responsive />
-            <x-button label="Registrate" icon="o-user-plus" link="/" class="btn-outline" responsive />
+            @if ($rol && $rol != 'Cliente')
+                <x-button label="Inicio" icon="o-arrow-top-right-on-square" link="/inicio" class="btn-success" responsive />
+            @elseif ($rol && $rol == 'Cliente')
+                <x-button label="Inicio" icon="o-home" link="/" class="hidden btn-ghost lg:flex" responsive />
+            @else
+                <x-button label="Inicio" icon="o-home" link="/" class="hidden btn-ghost lg:flex" responsive />
+                <x-button label="Ingresar" icon="o-arrow-top-right-on-square" link="/login" class="btn-success" responsive />
+                <x-button label="Registrate" icon="o-user-plus" link="/" class="btn-outline" responsive />
+            @endif
         </x-slot:actions>
     </x-nav>
 
