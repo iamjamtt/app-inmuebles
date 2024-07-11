@@ -2,7 +2,7 @@
 
 @if ($tipo == 'alta')
 
-# Hola {{ $usuario->persona->PerNombre }} {{ $usuario->persona->PerApellidoPaterno }} {{ $usuario->persona->PerApellidoMaterno }}.
+# Hola {{ $usuario->persona->PerNombres }} {{ $usuario->persona->PerApellidoPaterno }} {{ $usuario->persona->PerApellidoMaterno }}.
 
 Te damos la bienvenida a {{ config('app.name') }}. Te comunica que tu cuenta ha sido dado de alta exitosamente. A continuación, te proporcionamos tus credenciales de acceso:
 
