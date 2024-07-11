@@ -88,7 +88,7 @@ new #[Title('Usuarios | App Inmuebles')] class extends Component {
         }
         $usuario->save();
         $this->success('El estado del usuario fue cambiado correctamente.', position: 'toast-top toast-center');
-        $this->modalEstado = false;
+        $this->modalAlerta = false;
     }
 
     public function headers(): array
@@ -99,6 +99,7 @@ new #[Title('Usuarios | App Inmuebles')] class extends Component {
             ['key' => 'RolId', 'label' => 'Rol'],
             ['key' => 'UsuFechaCreacion', 'label' => 'F. Creación'],
             ['key' => 'UsuEstado', 'label' => 'Estado'],
+            ['key' => 'evidencia', 'label' => 'Evidencia', 'class' => 'w-32', 'sortable' => false],
             ['key' => 'accion', 'label' => 'Acciones', 'class' => 'w-32', 'sortable' => false],
         ];
     }
@@ -187,6 +188,20 @@ new #[Title('Usuarios | App Inmuebles')] class extends Component {
                 <div class="badge badge-error" wire:click="alertaStatus({{ $usuario->UsuId }})" style="cursor: pointer;">
                     <x-icon name="o-x-mark" class="w-4 h-4 me-2" />
                     De Baja
+                </div>
+            @endif
+            @endscope
+            @scope('cell_evidencia', $usuario)
+            @if ($usuario->rol-> RolNombre === 'Cliente' && $usuario->persona->tipo_evidencia)
+                <div class="flex space-x-2">
+                    <x-button
+                        link="{{ asset($usuario->persona->PerTipoEvidenciaArchivo) }}"
+                        external
+                        icon="o-document-chart-bar"
+                        spinner
+                        class="text-teal-500 btn-sm"
+                        tooltip="{{ $usuario->persona->tipo_evidencia->TipEviNombre }}"
+                    />
                 </div>
             @endif
             @endscope

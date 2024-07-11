@@ -41,7 +41,7 @@ function colorRol($rol): string
     return $color;
 }
 
-function subirArchivo($file, $ruta_archivo, $folders, $nombre_archivo = null)
+function subirArchivo($file, $ruta_archivo, $folders, $nombre_archivo = null, $extension = null)
 {
     if (file_exists($ruta_archivo)) {
         unlink($ruta_archivo);
@@ -52,7 +52,7 @@ function subirArchivo($file, $ruta_archivo, $folders, $nombre_archivo = null)
     $path = asignarPermisoFolders($base_path, $folders);
 
     // Nombre del archivo
-    $filename = ($nombre_archivo ? $nombre_archivo : time() . uniqid()) . '.jpg';
+    $filename = ($nombre_archivo ? $nombre_archivo : time() . uniqid()) . '.' . ($extension ? $extension : $file->getClientOriginalExtension());
     $nombre_db = $path . $filename;
 
     // Guardar el archivo

@@ -58,7 +58,7 @@ new #[Title('Registro de Clientes')] #[Layout('components.layouts.auth')] class 
         if ($this->evidencia) {
             $folders = ['evidencias', 'personas'];
             $ruta_archivo = $persona->PerTipoEvidenciaArchivo ? $persona->PerTipoEvidenciaArchivo : null;
-            $persona->PerTipoEvidenciaArchivo = subirArchivo($this->evidencia, $ruta_archivo, $folders, null);
+            $persona->PerTipoEvidenciaArchivo = subirArchivo($this->evidencia, $ruta_archivo, $folders, null, null);
         }
         $persona->save();
 

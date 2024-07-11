@@ -77,7 +77,7 @@ new #[Title('Formulario Inmuebles | App Inmuebles')] class extends Component {
         if ($this->photo) {
             $folders = ['inmuebles', 'fotos'];
             $ruta_archivo = $inmueble->InmFoto ? $inmueble->InmFoto : null;
-            $inmueble->InmFoto = subirArchivo($this->photo, $ruta_archivo, $folders, null);
+            $inmueble->InmFoto = subirArchivo($this->photo, $ruta_archivo, $folders, null, 'jpg');
         }
         $inmueble->InmFechaCreacion = now();
         $inmueble->save();
