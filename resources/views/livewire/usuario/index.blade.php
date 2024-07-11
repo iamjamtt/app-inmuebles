@@ -7,6 +7,7 @@ use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Collection;
+use App\Mail\VerificarUsuarioMail;
 
 new #[Title('Usuarios | App Inmuebles')] class extends Component {
     use Toast, WithPagination;
@@ -83,8 +84,14 @@ new #[Title('Usuarios | App Inmuebles')] class extends Component {
         $usuario->UsuEstado = !$usuario->UsuEstado;
         if ($usuario->UsuEstado) {
             $usuario->UsuFechaDadoAlta = now();
+            if ($usuario->rol->RolNombre === 'Cliente') {
+                Mail::to($usuario->persona->PerCorreo)->send(new VerificarUsuarioMail($usuario->UsuId, 'alta'));
+            }
         } else {
             $usuario->UsuFechaDadoBaja = now();
+            if ($usuario->rol->RolNombre === 'Cliente') {
+                Mail::to($usuario->persona->PerCorreo)->send(new VerificarUsuarioMail($usuario->UsuId, 'baja'));
+            }
         }
         $usuario->save();
         $this->success('El estado del usuario fue cambiado correctamente.', position: 'toast-top toast-center');
