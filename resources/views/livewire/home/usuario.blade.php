@@ -104,7 +104,7 @@ new #[Title('App Inmuebles')] #[Layout('components.layouts.user')] class extends
     </div>
 
     <!-- MODALS -->
-    <x-modal wire:model="modalInmueble" title="{{ $titleModal }}" subtitle="{{ $subtitleModal }}" box-class="w-11/12 max-w-5 xl" separator>
+    <x-modal wire:model="modalInmueble" title="{{ $titleModal }}" subtitle="{{ $subtitleModal }}" box-class="w-11/12 max-w-5xl" separator>
         <x-form>
             {{-- <x-input label="Nombre" required wire:model="nombre_habitacion" placeholder="Ingrese el nombre de la habitación" />
             <x-input label="Precio" required wire:model="precio_habitacion" money locale="es-PE" /> --}}
