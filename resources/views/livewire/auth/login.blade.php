@@ -38,6 +38,16 @@ new #[Title('Login')] #[Layout('components.layouts.auth')] class extends Compone
 
         auth()->login($usuario);
 
+        if ($usuario->rol->RolNombre === 'Cliente') {
+            $this->info(
+                '¡Bienvenido!',
+                'Has iniciado sesión correctamente.',
+                redirectTo: '/',
+                position: 'toast-top toast-center'
+            );
+            return;
+        }
+
         $this->info(
             '¡Bienvenido!',
             'Has iniciado sesión correctamente.',
@@ -47,8 +57,8 @@ new #[Title('Login')] #[Layout('components.layouts.auth')] class extends Compone
     }
 }; ?>
 
-<div class="md:w-96 mx-auto mt-20">
-    <div class="mb-10 flex justify-center">
+<div class="mx-auto mt-20 md:w-96">
+    <div class="flex justify-center mb-10">
         <x-app-inmueble />
     </div>
 
@@ -63,7 +73,7 @@ new #[Title('Login')] #[Layout('components.layouts.auth')] class extends Compone
         <x-input label="Contraseña" wire:model.live="contraseña" type="password" icon="o-key" placeholder="********" />
 
         <x-slot:actions>
-            <x-button label="Ingresar" class="btn-primary w-full" icon="o-paper-airplane" type="submit" spinner="login" />
+            <x-button label="Ingresar" class="w-full btn-primary" icon="o-paper-airplane" type="submit" spinner="login" />
         </x-slot:actions>
     </x-form>
 <div>
