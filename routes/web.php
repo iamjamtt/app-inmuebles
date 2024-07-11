@@ -9,6 +9,10 @@ Volt::route('/login', 'auth.login')
     ->middleware('guest')
     ->name('login');
 
+Volt::route('/registro', 'auth.registro')
+    ->middleware('guest')
+    ->name('registro');
+
 Volt::route('/inicio', 'home.index')
     ->name('home.index');
 
