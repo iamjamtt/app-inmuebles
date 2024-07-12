@@ -86,6 +86,7 @@ new #[Title('App Inmuebles')] #[Layout('components.layouts.user')] class extends
         $alquiler = new Alquiler();
         $alquiler->ArrendadorId = $this->inmueble->usuario->PerId;
         $alquiler->ClienteId = auth()->user()->PerId;
+        $alquiler->AlqNombre = 'Alquiler de Inmueble - ' . $this->inmueble->InmNombre;
         $alquiler->AlqMontoTotal = calcularMontoTotalAlquiler($this->habitaciones);
         $alquiler->AlqMontoMensual = calcularMontoMensualAlquiler($this->habitaciones, $this->meses);
         $alquiler->AlqMontoPenalidad = 0;

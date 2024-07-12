@@ -17,6 +17,10 @@ Volt::route('/perfil/{UsuId}', 'perfil.index')
     ->middleware('auth')
     ->name('perfil.index');
 
+Volt::route('/mis-alquileres', 'alquiler.mis-alquileres')
+    ->middleware('auth')
+    ->name('alquiler.mis-alquileres');
+
 Volt::route('/inicio', 'home.index')
     ->name('home.index');
 

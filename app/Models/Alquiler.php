@@ -18,6 +18,7 @@ class Alquiler extends Model
         'AlqId',
         'ArrendadorId',
         'ClienteId',
+        'AlqNombre',
         'AlqMontoTotal',
         'AlqMontoMensual',
         'AlqMontoPenalidad',

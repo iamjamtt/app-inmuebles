@@ -78,7 +78,7 @@ new #[Title('Inmuebles | App Inmuebles')] class extends Component {
     public function cantidadTabla(): array
     {
         return [
-            ['id' => 10, 'name' => '5'],
+            ['id' => 5, 'name' => '5'],
             ['id' => 10, 'name' => '10'],
             ['id' => 20, 'name' => '20'],
             ['id' => 50, 'name' => '50'],

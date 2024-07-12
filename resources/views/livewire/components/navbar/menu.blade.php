@@ -31,6 +31,7 @@ new class extends Component {
         <x-button label="Inicio" icon="o-arrow-top-right-on-square" link="/inicio" class="btn-success" responsive />
     @elseif ($rol && $rol == 'Cliente')
         <x-button label="Inicio" icon="o-home" link="/" class="hidden btn-ghost lg:flex" responsive />
+        <x-button label="Mis Alquileres" icon="o-shopping-cart" link="/mis-alquileres" class="btn-ghost" responsive />
         <x-dropdown label="Settings" class="btn-ghost" right>
             <x-slot:label>
                 <x-avatar :image="$usuario->avatar" />
