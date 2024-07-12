@@ -37,6 +37,7 @@ new class extends Component {
                 {{ '@'.$usuario->UsuUsername }}
             </x-slot:label>
             <x-menu-item title="Inicio" icon="o-home" link="/" />
+            <x-menu-item title="Perfil" icon="o-user" link="/perfil/{{ $usuario->UsuId }}" />
             <x-menu-separator />
             <x-menu-item title="Cerrar Sesión" icon="o-power" wire:click="logout" />
         </x-dropdown>

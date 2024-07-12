@@ -13,6 +13,10 @@ Volt::route('/registro', 'auth.registro')
     ->middleware('guest')
     ->name('registro');
 
+Volt::route('/perfil/{UsuId}', 'perfil.index')
+    ->middleware('auth')
+    ->name('perfil.index');
+
 Volt::route('/inicio', 'home.index')
     ->name('home.index');
 
