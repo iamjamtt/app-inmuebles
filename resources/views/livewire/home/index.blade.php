@@ -27,7 +27,12 @@ new class extends Component {
                 'inmuebles_count' => $inmuebles_count,
             ];
         } else {
-            return [];
+            $inmuebles_count = Inmueble::query()
+                ->where('UsuId', $this->usuario->UsuId)
+                ->count();
+            return [
+                'inmuebles_count' => $inmuebles_count
+            ];
         }
     }
 }; ?>
@@ -45,7 +50,7 @@ new class extends Component {
             <x-stat title="Usuarios Dados de Alta" value="{{ $usuarios_de_alta }}" icon="o-user-plus" color="text-teal-600" />
             <x-stat title="Inmuebles" value="{{ $inmuebles_count }}" icon="o-home-modern" color="text-teal-600" />
         @else
-
+            <x-stat title="Inmuebles" value="{{ $inmuebles_count }}" icon="o-home-modern" color="text-teal-600" />
         @endif
     </div>
 </div>
