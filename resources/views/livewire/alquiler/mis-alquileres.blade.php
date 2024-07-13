@@ -169,7 +169,7 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
             ['key' => 'AlqFechaFin', 'label' => 'F. Fin', 'sortable' => false],
             ['key' => 'AlqTienePenalidad', 'label' => 'Penalidad', 'sortable' => false],
             ['key' => 'AlqEstado', 'label' => 'Estado'],
-            ['key' => 'accion', 'label' => 'Acciones', 'class' => 'w-48', 'sortable' => false],
+            ['key' => 'accion', 'label' => 'Acciones', 'class' => 'w-54', 'sortable' => false],
         ];
     }
 
@@ -277,12 +277,21 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
             <x-button
                 icon="o-eye"
                 class="btn-sm"
+                tooltip="Ver Detalles"
                 wire:click="cargarDetalleAlquiler({{ $item->AlqId }})"
             />
             <x-button
                 icon="o-credit-card"
                 class="btn-sm"
+                tooltip="Ver Pagos"
                 link="/mis-alquileres/{{ $item->AlqId }}/pagos"
+            />
+            <x-button
+                icon="o-clipboard"
+                class="btn-sm"
+                tooltip="Ver Contrato"
+                link="/mis-alquileres/{{ $item->AlqId }}/contrato"
+                external
             />
             @if (!$item->AlqFinalizado)
             <x-dropdown>

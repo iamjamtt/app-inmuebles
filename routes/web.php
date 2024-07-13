@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AlquilerController;
+use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Volt::route('/', 'home.usuario')
@@ -20,6 +22,10 @@ Volt::route('/perfil/{UsuId}', 'perfil.index')
 Volt::route('/mis-alquileres', 'alquiler.mis-alquileres')
     ->middleware('auth')
     ->name('alquiler.mis-alquileres');
+
+Route::get('/mis-alquileres/{AlqId}/contrato', [AlquilerController::class, 'pdf'])
+    ->middleware('auth')
+    ->name('alquiler.pdf');
 
 Volt::route('/mis-alquileres/{AlqId}/pagos', 'alquiler.pagos')
     ->middleware('auth')
