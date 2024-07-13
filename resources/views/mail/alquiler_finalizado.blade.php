@@ -11,7 +11,7 @@ Tu alquiler ha finalizado con éxito.
 
 Para más detalles, puedes ver el alquiler en la plataforma. Si tienes alguna duda, no dudes en contactarnos.
 
-<x-mail::button :url="route('home.usuario')">
+<x-mail::button :url="route('alquiler.mis-alquileres')">
 Ver alquiler
 </x-mail::button>
 

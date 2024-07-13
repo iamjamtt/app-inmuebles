@@ -5,12 +5,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
-use App\Models\Inmueble;
-use App\Models\Alquiler;
-use App\Models\AlquilerDetalle;
-use App\Models\HabitacionInmueble;
-use App\Models\PagoMensualidad;
-use App\Models\TipoInmueble;
+use App\Models\{Alquiler, AlquilerDetalle, PagoMensualidad};
 use App\Mail\AlquilerMail;
 use Livewire\WithPagination;
 
@@ -21,6 +16,9 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
     public int $cantidadPage = 5;
 
     public $detalle = [];
+
+    public bool $tienePenalidad = false;
+    public string $tipoPenalidad = '';
 
     // Modal Ver Alquiler
     public bool $modalVerAlquiler = false;
@@ -33,6 +31,7 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
     public bool $modalAlerta = false;
     public string $titleModalAlerta = '';
     public string $subtitleModalAlerta = '';
+    public string $textModalAlerta = '';
     public string $buttonModalAlerta = '';
     public string $actionModalAlerta = '';
 
@@ -57,6 +56,107 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
         $this->modalVerAlquiler = true;
     }
 
+    public function alertaCancelarContrato(Alquiler $alquiler): void
+    {
+        // verificamos si tiene pagos pendientes
+        $pagos = PagoMensualidad::query()
+            ->where('AlqId', $alquiler->AlqId)
+            ->where('PagMenEstado', false)
+            ->get();
+
+        $tienePagosPendientes = $pagos->count() > 0 ? true : false;
+
+        // verificamos si la fecha actual es mayor a la fecha fin de alquiler
+        $fecha_actual = date('Y-m-d');
+        $fecha_actual = strtotime($fecha_actual);
+        $fecha_fin = $alquiler->AlqFechaFin;
+        $fecha_fin = strtotime($fecha_fin);
+
+        $pasoFechaFin = $fecha_actual > $fecha_fin ? true : false;
+
+        $this->tienePenalidad = false;
+        $this->tipoPenalidad = '';
+
+        if ($tienePagosPendientes && $pasoFechaFin) {
+            $this->textModalAlerta = 'Estas queriendo cancelar el contrato de alquiler, pero tienes pagos pendientes y has pasado la fecha de fin de alquiler, se cobrará una penalidad del 15% del monto total de alquiler. Su penalidad es de S/. ' . (number_format($alquiler->AlqMontoTotal * 0.15, 2, '.', ''));
+            $this->tienePenalidad = true;
+            $this->tipoPenalidad = '15%';
+        } elseif ($tienePagosPendientes && !$pasoFechaFin) {
+            $this->textModalAlerta = 'Estas queriendo cancelar el contrato de alquiler, pero tienes pagos pendientes y aun no has pasado la fecha de fin de alquiler, se cobrará una penalidad del 20% del monto total de alquiler. Su penalidad es de S/. ' . (number_format($alquiler->AlqMontoTotal * 0.20, 2, '.', ''));
+            $this->tienePenalidad = true;
+            $this->tipoPenalidad = '20%';
+        }
+
+        // cargar modal de alerta
+        $this->titleModalAlerta = 'Cancelar Contrato';
+        $this->subtitleModalAlerta = '¿Estás seguro de cancelar el contrato de alquiler?';
+        $this->buttonModalAlerta = 'Sí, Cancelar';
+        $this->actionModalAlerta = 'cancelarContrato(' . $alquiler . ')';
+        $this->modalAlerta = true;
+    }
+
+    public function cancelarContrato(Alquiler $alquiler): void
+    {
+        if ($this->tienePenalidad) {
+            if ($this->tipoPenalidad == '15%') {
+                $penalidad = $alquiler->AlqMontoTotal * 0.15;
+            } elseif ($this->tipoPenalidad == '20%') {
+                $penalidad = $alquiler->AlqMontoTotal * 0.20;
+            }
+        }
+
+        $alquiler->AlqMontoPenalidad = $penalidad;
+        $alquiler->AlqTienePenalidad = true;
+        $alquiler->AlqEstado = false;
+        $alquiler->AlqFinalizado = true;
+        $alquiler->save();
+
+        // Verificar si el alquiler tiene pagos pendientes para marcarlos como pagados
+        $pagos = PagoMensualidad::query()
+            ->where('AlqId', $alquiler->AlqId)
+            ->where('PagMenEstado', false)
+            ->get();
+
+        if ($pagos->count() > 0) {
+            foreach ($pagos as $pago) {
+                $pago->PagMenMontoPagado = $pago->PagMenMontoPago;
+                $pago->PagMenEstado = true;
+                $pago->PagMenFechaPago = now();
+                $pago->save();
+            }
+        }
+
+        // A la ultima mensualidad se le cobra la penalidad
+        $ultima_mensualidad = PagoMensualidad::query()
+            ->where('AlqId', $alquiler->AlqId)
+            ->where('PagMenEstado', true)
+            ->orderBy('PagMenId', 'desc')
+            ->first();
+
+        if ($this->tienePenalidad) {
+            $ultima_mensualidad->PagMenMontoPagado = $ultima_mensualidad->PagMenMontoPago + $penalidad;
+            $ultima_mensualidad->PagMenEstado = true;
+            $ultima_mensualidad->PagMenFechaPago = now();
+            $ultima_mensualidad->save();
+        }
+
+        // verificamos si todos los pagos estan pagados para desocupar el inmueble, pisos y habitaciones
+        $pagos = PagoMensualidad::query()
+            ->where('AlqId', $alquiler->AlqId)
+            ->where('PagMenEstado', false)
+            ->get();
+
+        if ($pagos->count() == 0) {
+            $detalle = $alquiler->detalles;
+            foreach ($detalle as $item) {
+                modificamosEstadoOcupado($item->HabInmId, false);
+            }
+        }
+
+        $this->modalAlerta = false;
+        $this->toast('El contrato de alquiler ha sido cancelado.', 'success');
+    }
+
     public function headers(): array
     {
         return [
@@ -69,7 +169,7 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
             ['key' => 'AlqFechaFin', 'label' => 'F. Fin', 'sortable' => false],
             ['key' => 'AlqTienePenalidad', 'label' => 'Penalidad', 'sortable' => false],
             ['key' => 'AlqEstado', 'label' => 'Estado'],
-            ['key' => 'accion', 'label' => 'Acciones', 'class' => 'w-32', 'sortable' => false],
+            ['key' => 'accion', 'label' => 'Acciones', 'class' => 'w-48', 'sortable' => false],
         ];
     }
 
@@ -109,7 +209,6 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
     >
     </x-header>
 
-    <!-- CONTENT -->
     <!-- TABLE  -->
     <x-card title="Lista de mis Alquileres" class="shadow-lg" shadow separator>
         <x-slot:menu>
@@ -124,7 +223,7 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
             {{ $item->AlqId }}
             @endscope
             @scope('cell_AlqNombre', $item)
-            {{ $item->AlqNombre }}
+            {{ Str::limit($item->AlqNombre, 40)}}
             @endscope
             @scope('cell_AlqMontoTotal', $item)
             {{ 'S/. ' . $item->AlqMontoTotal }}
@@ -157,15 +256,20 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
             @endif
             @endscope
             @scope('cell_AlqEstado', $item)
-            @if($item->AlqEstado)
+            @if($item->AlqEstado && $item->AlqFinalizado)
+                <div class="badge badge-success">
+                    <x-icon name="o-check" class="w-4 h-4 me-2" />
+                    Finalizado
+                </div>
+            @elseif ($item->AlqEstado && !$item->AlqFinalizado)
                 <div class="badge badge-info">
                     <x-icon name="o-check" class="w-4 h-4 me-2" />
-                    Activo
+                    Alquilado
                 </div>
-            @else
+            @elseif (!$item->AlqEstado && $item->AlqFinalizado)
                 <div class="badge badge-error">
-                    <x-icon name="o-x-mark" class="w-4 h-4 me-2" />
-                    Inactivo
+                    <x-icon name="o-information-circle" class="w-4 h-4 me-2" />
+                    Cancelado
                 </div>
             @endif
             @endscope
@@ -175,6 +279,12 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
                 class="btn-sm"
                 wire:click="cargarDetalleAlquiler({{ $item->AlqId }})"
             />
+            <x-button
+                icon="o-credit-card"
+                class="btn-sm"
+                link="/mis-alquileres/{{ $item->AlqId }}/pagos"
+            />
+            @if (!$item->AlqFinalizado)
             <x-dropdown>
                 <x-slot:trigger>
                     <x-button icon="o-ellipsis-horizontal" class="btn-sm" />
@@ -182,9 +292,10 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
                 <x-menu-item
                     title="Cancelar Contrato"
                     icon="o-x-mark"
-                    wire:click="alertaCancelarContrato({{ $item->InmId }})"
+                    wire:click="alertaCancelarContrato({{ $item->AlqId }})"
                 />
             </x-dropdown>
+            @endif
             @endscope
         </x-table>
     </x-card>
@@ -224,10 +335,10 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
 
     <!-- MODALS -->
     <x-modal wire:model="modalAlerta" title="{{ $titleModalAlerta }}" subtitle="{{ $subtitleModalAlerta }}">
+        {{ $textModalAlerta }}
         <x-slot:actions>
             <x-button label="Cancelar" @click="$wire.modalAlerta = false" />
             <x-button label="{{ $buttonModalAlerta }}" class="btn-success" wire:click="{{ $actionModalAlerta }}" />
         </x-slot:actions>
     </x-modal>
-</div>
 </div>

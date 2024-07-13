@@ -21,6 +21,10 @@ Volt::route('/mis-alquileres', 'alquiler.mis-alquileres')
     ->middleware('auth')
     ->name('alquiler.mis-alquileres');
 
+Volt::route('/mis-alquileres/{AlqId}/pagos', 'alquiler.pagos')
+    ->middleware('auth')
+    ->name('alquiler.pagos');
+
 Volt::route('/inicio', 'home.index')
     ->name('home.index');
 

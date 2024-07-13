@@ -48,11 +48,8 @@ new class extends Component {
         @endif
         @if ($usuario->rol->RolNombre == 'Cliente')
         <x-menu-item title="Inicio" icon="o-home" link="/" />
+        <x-menu-item title="Mis Alquileres" icon="o-shopping-cart" link="/mis-alquileres" />
         @endif
-        {{-- <x-menu-sub title="Settings" icon="o-cog-6-tooth">
-            <x-menu-item title="Wifi" icon="o-wifi" link="####" />
-            <x-menu-item title="Archives" icon="o-archive-box" link="####" />
-        </x-menu-sub> --}}
     @else
     <x-menu-item title="Inicio" icon="o-home" link="/" />
     <x-menu-item title="Ingresar" icon="o-arrow-top-right-on-square" link="/login" />

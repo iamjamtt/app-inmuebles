@@ -26,6 +26,7 @@ class Alquiler extends Model
         'AlqFechaInicio',
         'AlqFechaFin',
         'AlqEstado',
+        'AlqFinalizado',
         'AlqTienePenalidad',
         'AlqObservacionPenalidad',
         'AlqFechaCreacion',
