@@ -38,6 +38,10 @@ Volt::route('/usuarios', 'usuario.index')
     ->middleware('auth')
     ->name('usuario.index');
 
+Volt::route('/reportes', 'reporte.index')
+    ->middleware('auth')
+    ->name('reporte.index');
+
 Volt::route('/inmuebles', 'inmueble.index')
     ->middleware('auth')
     ->name('inmueble.index');
