@@ -114,6 +114,7 @@ new #[Title('Asignar Pisos a los Inmuebles | App Inmuebles')] class extends Comp
     {
         $this->mostrarHabitaciones = true;
         $this->pisoInmueble = $piso_inmueble;
+        $this->cantidad_habitaciones = $this->pisoInmueble->habitaciones()->count();
     }
 
     public function alertaStatus($id, $tipo): void
@@ -126,9 +127,14 @@ new #[Title('Asignar Pisos a los Inmuebles | App Inmuebles')] class extends Comp
             $this->buttonModalAlerta = 'Confirmar';
             $this->actionModalAlerta = 'change_status_piso';
             $this->modalAlerta = true;
-        } elseif ($tipo === 'habitacion')
-        {
+        } elseif ($tipo === 'habitacion') {
             $habitacion_inmueble = HabitacionInmueble::find($id);
+            // verificamos si la habitacion esta ocupada
+            if ($habitacion_inmueble->HabInmOcupado) {
+                $this->error('No se puede cambiar el estado de una habitación ocupada.', position: 'toast-top toast-center');
+                return;
+            }
+            
             $this->habitacionInmueble = $habitacion_inmueble;
             $this->titleModalAlerta = '¿Estas seguro de cambiar el estado de esta habitación?';
             $this->subtitleModalAlerta = 'Click en confirmar para cambiar el estado de la habitación.';
@@ -154,6 +160,12 @@ new #[Title('Asignar Pisos a los Inmuebles | App Inmuebles')] class extends Comp
     {
         $this->habitacionInmueble->HabInmEstado = !$this->habitacionInmueble->HabInmEstado;
         $this->habitacionInmueble->save();
+
+        // verificamos si tiene al menos una habitacion activa para mostrar las habitaciones
+        $this->pisoInmueble->load('habitaciones');
+        $this->cantidad_habitaciones = $this->pisoInmueble->habitaciones()->count();
+
+        modificamosEstadoOcupado($this->habitacionInmueble->HabInmId, false);
 
         $this->inmueble->load('pisos');
         $this->mostrarHabitaciones = true;
