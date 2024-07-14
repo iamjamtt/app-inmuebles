@@ -41,6 +41,40 @@ new #[Title('Mis Alquileres de Inmuebles')] #[Layout('components.layouts.user')]
         if ($usuario->rol->RolNombre != 'Cliente') {
             abort(403, 'No tienes permisos para acceder a esta página.');
         }
+
+        // verificamos si tiene alquileres pagados para desocupar el inmueble si ya cumplio con la fecha de fin de alquiler
+        $alquileres = Alquiler::query()
+            ->where('ClienteId', $usuario->persona->PerId)
+            ->where('AlqEstado', true)
+            ->where('AlqFinalizado', false)
+            ->get();
+
+        foreach ($alquileres as $alquiler) {
+            $pagos = PagoMensualidad::query()
+                ->where('AlqId', $alquiler->AlqId)
+                ->where('PagMenEstado', false)
+                ->get();
+
+            if ($pagos->count() == 0) {
+                $fecha_actual = date('Y-m-d');
+                $fecha_actual = strtotime($fecha_actual);
+                $fecha_fin = $alquiler->AlqFechaFin;
+                $fecha_fin = strtotime($fecha_fin);
+
+                $pasoFechaFin = $fecha_actual > $fecha_fin ? true : false;
+
+                if ($pasoFechaFin) {
+                    $alquiler->AlqEstado = true;
+                    $alquiler->AlqFinalizado = true;
+                    $alquiler->save();
+
+                    $detalle = $alquiler->detalles;
+                    foreach ($detalle as $item) {
+                        modificamosEstadoOcupado($item->HabInmId, false);
+                    }
+                }
+            }
+        }
     }
 
     public function cargarDetalleAlquiler(Alquiler $alquiler): void

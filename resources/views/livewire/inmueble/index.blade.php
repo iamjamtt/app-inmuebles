@@ -2,6 +2,8 @@
 
 use Mary\Traits\Toast;
 use App\Models\Inmueble;
+use App\Models\Alquiler;
+use App\Models\PagoMensualidad;
 use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -24,6 +26,44 @@ new #[Title('Inmuebles | App Inmuebles')] class extends Component {
     public string $subtitleModalAlerta = 'Click en confirmar para cambiar el estado del inmueble.';
     public string $buttonModalAlerta = '';
     public string $actionModalAlerta = '';
+
+    public function mount(): void
+    {
+        // verificamos si tiene alquileres pagados para desocupar el inmueble si ya cumplio con la fecha de fin de alquiler
+        $usuario = auth()->user();
+        $alquileres = Alquiler::query()
+            ->where('ArrendadorId', $usuario->persona->PerId)
+            ->where('AlqEstado', true)
+            ->where('AlqFinalizado', false)
+            ->get();
+
+        foreach ($alquileres as $alquiler) {
+            $pagos = PagoMensualidad::query()
+                ->where('AlqId', $alquiler->AlqId)
+                ->where('PagMenEstado', false)
+                ->get();
+
+            if ($pagos->count() == 0) {
+                $fecha_actual = date('Y-m-d');
+                $fecha_actual = strtotime($fecha_actual);
+                $fecha_fin = $alquiler->AlqFechaFin;
+                $fecha_fin = strtotime($fecha_fin);
+
+                $pasoFechaFin = $fecha_actual > $fecha_fin ? true : false;
+
+                if ($pasoFechaFin) {
+                    $alquiler->AlqEstado = true;
+                    $alquiler->AlqFinalizado = true;
+                    $alquiler->save();
+
+                    $detalle = $alquiler->detalles;
+                    foreach ($detalle as $item) {
+                        modificamosEstadoOcupado($item->HabInmId, false);
+                    }
+                }
+            }
+        }
+    }
 
     public function alertaStatus(Inmueble $inmueble): void
     {
