@@ -32,6 +32,20 @@ new #[Title('Reportes | App Inmuebles')] class extends Component {
         $this->data = new Collection();
     }
 
+    public function updatedReporte(): void
+    {
+        $this->limpiar();
+    }
+
+    public function limpiar(): void
+    {
+        $this->fecha = null;
+        $this->fecha_inicio = '';
+        $this->fecha_fin = '';
+        $this->mostrar = false;
+        $this->data = new Collection();
+    }
+
     public function filtrar(): void
     {
         if ($this->fecha == null) {
@@ -154,7 +168,10 @@ new #[Title('Reportes | App Inmuebles')] class extends Component {
         <div class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <x-datepicker label="Ingrese la fecha" wire:model="fecha" icon="o-calendar" :config="$configDate" />
-                <x-button label="Filtrar" wire:click="filtrar" class="mt-7 btn-primary" />
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <x-button label="Filtrar" wire:click="filtrar" class="mt-7 btn-primary" />
+                    <x-button label="Limpiar" wire:click="limpiar" class="mt-7 btn-outline" />
+                </div>
                 @if ($mostrar)
                     <div class="col-span-2">
                         <x-card shadow separator>
