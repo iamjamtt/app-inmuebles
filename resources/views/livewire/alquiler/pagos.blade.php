@@ -108,11 +108,19 @@ new #[Title('Mis Pagos de Inmuebles')] #[Layout('components.layouts.user')] clas
 
         if ($pagos->count() == 0) {
             $alquiler = $this->alquiler;
-            $alquiler->AlqFinalizado = true;
-            $alquiler->save();
-            $detalle = $alquiler->detalles;
-            foreach ($detalle as $item) {
-                modificamosEstadoOcupado($item->HabInmId, false);
+
+            $fecha_fin = $alquiler->AlqFechaFin;
+            $fecha_fin = strtotime($fecha_fin);
+            $fecha_actual = now();
+            $fecha_actual = strtotime($fecha_actual);
+
+            if ($fecha_actual > $fecha_fin) {
+                $alquiler->AlqFinalizado = true;
+                $alquiler->save();
+                $detalle = $alquiler->detalles;
+                foreach ($detalle as $item) {
+                    modificamosEstadoOcupado($item->HabInmId, false);
+                }
             }
         }
 
