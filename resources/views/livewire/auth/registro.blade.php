@@ -10,6 +10,7 @@ use App\Models\Persona;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Livewire\WithFileUploads;
+use App\Mail\RegistroUsuarioMail;
 
 new #[Title('Registro de Clientes')] #[Layout('components.layouts.auth')] class extends Component {
     use Toast, WithFileUploads;
@@ -69,6 +70,10 @@ new #[Title('Registro de Clientes')] #[Layout('components.layouts.auth')] class 
         $usuario->PerId = $persona->PerId;
         $usuario->UsuFechaCreacion = now();
         $usuario->save();
+
+        // obtenemos el correo del administrador para enviar el correo que hay un nuevo usuario registrado
+        $admini_correo = 'admin@app.inmueble';
+        Mail::to($usuario->persona->PerCorreo)->send(new RegistroUsuarioMail());
 
         $this->success(
             '¡Bienvenido!',
