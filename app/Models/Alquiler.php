@@ -40,6 +40,7 @@ class Alquiler extends Model
         'AlqMontoMensual' => 'float',
         'AlqMontoPenalidad' => 'float',
         'AlqEstado' => 'boolean',
+        'AlqFinalizado' => 'boolean',
         'AlqTienePenalidad' => 'boolean',
     ];
 
