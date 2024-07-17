@@ -118,6 +118,28 @@
                     </table>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    Fecha de inicio de alquiler: <strong>
+                        {{ convertirFecha($alquiler->AlqFechaInicio) }}
+                    </strong>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Fecha de fin de alquiler: <strong>
+                        {{ convertirFecha($alquiler->AlqFechaFin) }}
+                    </strong>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Inmueble:
+                    <strong>
+                        {{ str_replace('Alquiler de Inmueble - ', '', $alquiler->AlqNombre) }}
+                    </strong>
+                </td>
+            </tr>
             <tr class="heading">
                 <td>Contrato INV/00{{ $alquiler->AlqId }}</td>
                 <td></td>
@@ -174,6 +196,9 @@
                 </tr>
             @endif
         </table>
+        <p style="font-size: 12px; margin-top: 20px; font-weight: bold;">
+            "Estimado cliente, agradecemos su preferencia. En caso de cancelar el contrato antes de la fecha de fin, se aplicará una penalidad del 20% del monto total. En caso de cancelar el contrato después de la fecha de fin, se aplicará una penalidad del 15% del monto total."
+        </p>
         <p class="thank-you">
             ¡Gracias por confiar en nosotros!
         </p>
